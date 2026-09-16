@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no"
+  >
+
+  <title>まほうのレンズ Prototype 0</title>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <!-- MindAR + A-Frame -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- ARシーン -->
+  <a-scene
+    mindar-image="
+      imageTargetSrc: assets/markers/targets.mind;
+      autoStart: true;
+      uiLoading: yes;
+      uiScanning: yes;
+      uiError: yes;
+    "
+    embedded
+    color-space="sRGB"
+    renderer="
+      colorManagement: true;
+      physicallyCorrectLights: true;
+      antialias: true;
+      alpha: true;
+    "
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+
+    <!-- 使用する画像 -->
+    <a-assets>
+
+      <!-- 隠れている絵本キャラクター -->
+      <img
+        id="character-hide"
+        src="assets/images/character_hide.png"
+      >
+
+      <!-- 後のSTEPで使う -->
+      <img
+        id="character-slide"
+        src="assets/images/character_slide.png"
+      >
+
+    </a-assets>
+
+
+    <!-- MindARで認識するターゲット -->
+    <a-entity
+      id="target"
+      mindar-image-target="targetIndex: 0"
+    >
+
+      <!-- ARキャラクター -->
+      <a-image
+        id="ar-character"
+        src="#character-hide"
+        position="0 0 0"
+        width="1"
+        height="1"
+      >
+      </a-image>
+
+    </a-entity>
+
+
+    <!-- ARカメラ -->
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false"
+    >
+    </a-camera>
+
+  </a-scene>
+
+
+  <!-- JavaScript -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
