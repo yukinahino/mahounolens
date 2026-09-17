@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
 
@@ -19,52 +20,92 @@
 
     <div class="start-content">
 
-      <p class="event-name">
-        えほんpicnic
-      </p>
+      <section class="hero">
 
-      <h1 class="start-title">
-        まほうのレンズ
-      </h1>
+        <img
+          src="assets/images/title.png"
+          alt="まほうのレンズ"
+          class="hero-title-image"
+        >
 
-      <p class="start-lead">
-        きょうは、えほんピクニックのひ。<br>
-        うつぼこうえんにあつまった<br>
-        えほんたちが、にげだしちゃった！
-      </p>
+        <p class="hero-copy">
+          うつぼこうえん を たんけん して、<br>
+          えほんたち を さがしに いこう！
+        </p>
 
-      <p class="start-story">
-        「まほうのレンズ」をつかって、<br>
-        いなくなったえほんを<br>
-        さがしにいこう。
-      </p>
+        <img
+          src="assets/images/characters-group.png"
+          alt="えほんのなかまたち"
+          class="hero-characters"
+        >
 
-      <button
-        id="start-button"
-        class="start-button"
-        type="button"
-      >
-        まほうのレンズをひらく
-      </button>
+      </section>
 
-      <p class="permission-note">
-        ※この体験ではカメラと位置情報を使用します。
-      </p>
 
-      <p
-        id="location-error"
-        class="location-error"
-        hidden
-      >
-        ここでは、まほうのレンズをひらけないみたい。<br>
-        靱公園に行ってみよう！
-      </p>
+      <section class="guide">
+
+        <p class="guide-message">
+          まほうのレンズをひらいて、<br>
+          えほんたちをさがそう。
+        </p>
+
+        <img
+          src="assets/images/steps.png"
+          alt="1 まほうのレンズをひらく 2 えほんをさがす 3 おもいでをのこす"
+          class="steps-image"
+        >
+
+      </section>
+
+
+      <section class="actions">
+
+        <button
+          id="start-button"
+          class="image-button"
+          type="button"
+        >
+          <img
+            src="assets/images/button-start.png"
+            alt="まほうのレンズをひらく"
+          >
+        </button>
+
+
+        <p class="permission-note">
+          ※この体験ではカメラと位置情報を使用します。
+        </p>
+
+
+        <a
+          href="tutorial.html"
+          class="image-link-button"
+        >
+          <img
+            src="assets/images/button-tutorial.png"
+            alt="あそびかた"
+          >
+        </a>
+
+
+        <p
+          id="location-error"
+          class="location-error"
+          hidden
+        >
+          ここでは、まほうのレンズをひらけないみたい。<br>
+          靱公園に行ってみよう！
+        </p>
+
+      </section>
 
     </div>
 
   </main>
 
+
   <script src="js/start.js"></script>
 
 </body>
+
 </html>

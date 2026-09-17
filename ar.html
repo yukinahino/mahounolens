@@ -37,24 +37,73 @@
         <!-- 使用する画像 -->
         <a-assets>
 
-            <!-- 隠れている絵本キャラクター -->
-            <img id="character-hide" src="assets/images/character_hide.png">
+            <!-- index0：すべり台 -->
+            <img id="ar-slide" src="assets/images/ar_slide02.png">
 
-            <!-- 後のSTEPで使う -->
-            <img id="character-slide" src="assets/images/character_slide.png">
+            <!-- index1：花形トンネル -->
+            <img id="ar-flower" src="assets/images/ar_flower02.png">
+
+            <!-- index2：テーブル -->
+            <img id="ar-table" src="assets/images/ar_table02.png">
+
+            <!-- index3：水飲み場 -->
+            <img id="ar-water" src="assets/images/ar_water02.png">
+
+            <!-- index4：馬 -->
+            <img id="ar-horse" src="assets/images/ar_horse02.png">
 
         </a-assets>
 
 
         <!-- MindARで認識するターゲット -->
-        <a-entity id="target" mindar-image-target="targetIndex: 0">
+        <!-- index0：すべり台 -->
+        <a-entity id="target-slide" class="ar-target" mindar-image-target="targetIndex: 0">
 
-            <!-- ARキャラクター -->
-            <a-image id="ar-character" class="clickable" src="#character-hide" position="0 0 0.05" width="1" height="1">
+            <a-image id="ar-character-slide" class="clickable ar-character" src="#ar-slide" position="0 0 0" width="1"
+                height="1">
             </a-image>
 
         </a-entity>
 
+
+        <!-- index1：花形トンネル -->
+        <a-entity id="target-flower" class="ar-target" mindar-image-target="targetIndex: 1">
+
+            <a-image id="ar-character-flower" class="clickable ar-character" src="#ar-flower" position="0 0 0" width="1"
+                height="1">
+            </a-image>
+
+        </a-entity>
+
+
+        <!-- index2：テーブル -->
+        <a-entity id="target-table" class="ar-target" mindar-image-target="targetIndex: 2">
+
+            <a-image id="ar-character-table" class="clickable ar-character" src="#ar-table" position="0 0 0" width="1"
+                height="1">
+            </a-image>
+
+        </a-entity>
+
+
+        <!-- index3：水飲み場 -->
+        <a-entity id="target-water" class="ar-target" mindar-image-target="targetIndex: 3">
+
+            <a-image id="ar-character-water" class="clickable ar-character" src="#ar-water" position="0 0 0" width="1"
+                height="1">
+            </a-image>
+
+        </a-entity>
+
+
+        <!-- index4：馬 -->
+        <a-entity id="target-horse" class="ar-target" mindar-image-target="targetIndex: 4">
+
+            <a-image id="ar-character-horse" class="clickable ar-character" src="#ar-horse" position="0 0 0" width="1"
+                height="1">
+            </a-image>
+
+        </a-entity>
 
         <!-- ARカメラ -->
         <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse"
@@ -62,6 +111,10 @@
         </a-camera>
 
     </a-scene>
+
+    <div id="find-guide" class="find-guide">
+        隠れている絵本をタップしてみつけよう
+    </div>
 
     <div id="screenshot-guide" class="screenshot-guide" hidden>
         スクリーンショットで<br>
