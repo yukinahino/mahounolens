@@ -1,6 +1,91 @@
 <!DOCTYPE html>
 <html lang="ja">
 
+<style>
+    /* =========================
+       AR配置調整パネル
+       debug=true のときのみ表示
+    ========================== */
+
+    #ar-debug-panel {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        max-height: 92vh;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.96);
+        color: #222;
+        padding: 12px;
+        border-radius: 12px;
+        font-family: sans-serif;
+        box-sizing: border-box;
+    }
+
+    #ar-debug-panel h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+    }
+
+    .debug-preview {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        margin: 10px auto;
+        overflow: hidden;
+        background: #ddd;
+    }
+
+    #debug-marker-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+    }
+
+    #debug-character-image {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform-origin: center center;
+        pointer-events: none;
+    }
+
+    .debug-row {
+        display: grid;
+        grid-template-columns: 70px 1fr 55px;
+        gap: 8px;
+        align-items: center;
+        margin: 7px 0;
+    }
+
+    .debug-row input[type="range"] {
+        width: 100%;
+    }
+
+    .debug-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    #debug-output {
+        margin-top: 10px;
+        padding: 8px;
+        background: #eee;
+        font-size: 12px;
+        word-break: break-all;
+    }
+
+    #debug-target-select,
+    #debug-marker-file {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+</style>
+
 <head>
     <meta charset="UTF-8">
 
@@ -59,8 +144,8 @@
         <!-- index0：すべり台 -->
         <a-entity id="target-slide" class="ar-target" mindar-image-target="targetIndex: 0">
 
-            <a-image id="ar-character-slide" class="clickable ar-character" src="#ar-slide" position="0 0 0" width="1"
-                height="1">
+            <a-image id="ar-character-slide" class="clickable ar-character" src="#ar-slide" position="-0.22 0.13 0" rotation="0 0 17" width="0.6"
+                height="0.6">
             </a-image>
 
         </a-entity>
@@ -69,8 +154,8 @@
         <!-- index1：花形トンネル -->
         <a-entity id="target-flower" class="ar-target" mindar-image-target="targetIndex: 1">
 
-            <a-image id="ar-character-flower" class="clickable ar-character" src="#ar-flower" position="0 0 0" width="1"
-                height="1">
+            <a-image id="ar-character-flower" class="clickable ar-character" src="#ar-flower" position="0.09 -0.01 0" rotation="0 0 29" width="0.6"
+                height="0.6">
             </a-image>
 
         </a-entity>
@@ -79,8 +164,8 @@
         <!-- index2：テーブル -->
         <a-entity id="target-table" class="ar-target" mindar-image-target="targetIndex: 2">
 
-            <a-image id="ar-character-table" class="clickable ar-character" src="#ar-table" position="0 0 0" width="1"
-                height="1">
+            <a-image id="ar-character-table" class="clickable ar-character" src="#ar-table" position="0.35 0.35 0" width="0.5"
+                height="0.5">
             </a-image>
 
         </a-entity>
@@ -89,8 +174,8 @@
         <!-- index3：水飲み場 -->
         <a-entity id="target-water" class="ar-target" mindar-image-target="targetIndex: 3">
 
-            <a-image id="ar-character-water" class="clickable ar-character" src="#ar-water" position="0 0 0" width="1"
-                height="1">
+            <a-image id="ar-character-water" class="clickable ar-character" src="#ar-water" position="0.25 -0.12 0" rotation="0 0 15"
+                width="0.45" height="0.45">
             </a-image>
 
         </a-entity>
@@ -99,8 +184,8 @@
         <!-- index4：馬 -->
         <a-entity id="target-horse" class="ar-target" mindar-image-target="targetIndex: 4">
 
-            <a-image id="ar-character-horse" class="clickable ar-character" src="#ar-horse" position="0 0 0" width="1"
-                height="1">
+            <a-image id="ar-character-horse" class="clickable ar-character" src="#ar-horse" position="3 0 0"
+                scale="-1 1 1" width="0.7" height="0.7">
             </a-image>
 
         </a-entity>
@@ -125,7 +210,102 @@
         つぎへ
     </button>
 
+    <!-- ======================================
+     AR配置調整パネル
+     ar.html?debug=true のときのみ表示
+======================================= -->
+    <div id="ar-debug-panel">
 
+        <h3>AR配置調整モード</h3>
+
+        <!-- 調整対象 -->
+        <select id="debug-target-select">
+            <option value="slide">index0：すべり台</option>
+            <option value="flower">index1：花形トンネル</option>
+            <option value="table">index2：テーブル</option>
+            <option value="water">index3：水飲み場</option>
+            <option value="horse">index4：馬</option>
+        </select>
+
+        <!-- マーカー画像 -->
+        <label>
+            マーカー画像を選択
+            <input id="debug-marker-file" type="file" accept="image/*">
+        </label>
+
+        <!-- プレビュー -->
+        <div id="debug-preview" class="debug-preview">
+
+            <img id="debug-marker-image" alt="マーカー">
+
+            <img id="debug-character-image" alt="ARキャラクター">
+
+        </div>
+
+
+        <!-- X -->
+        <div class="debug-row">
+            <label>X</label>
+            <input id="debug-x" type="range" min="-2" max="2" step="0.01">
+            <span id="debug-x-value"></span>
+        </div>
+
+        <!-- Y -->
+        <div class="debug-row">
+            <label>Y</label>
+            <input id="debug-y" type="range" min="-2" max="2" step="0.01">
+            <span id="debug-y-value"></span>
+        </div>
+
+        <!-- Z -->
+        <div class="debug-row">
+            <label>Z</label>
+            <input id="debug-z" type="range" min="-1" max="1" step="0.01">
+            <span id="debug-z-value"></span>
+        </div>
+
+        <!-- width -->
+        <div class="debug-row">
+            <label>Width</label>
+            <input id="debug-width" type="range" min="0.1" max="4" step="0.01">
+            <span id="debug-width-value"></span>
+        </div>
+
+        <!-- height -->
+        <div class="debug-row">
+            <label>Height</label>
+            <input id="debug-height" type="range" min="0.1" max="4" step="0.01">
+            <span id="debug-height-value"></span>
+        </div>
+
+        <!-- rotation Z -->
+        <div class="debug-row">
+            <label>回転</label>
+            <input id="debug-rotation" type="range" min="-180" max="180" step="1">
+            <span id="debug-rotation-value"></span>
+        </div>
+
+
+        <!-- 反転 -->
+        <div class="debug-buttons">
+
+            <label>
+                <input id="debug-flip-x" type="checkbox">
+                左右反転
+            </label>
+
+            <label>
+                <input id="debug-flip-y" type="checkbox">
+                上下反転
+            </label>
+
+        </div>
+
+
+        <!-- 最終コード -->
+        <div id="debug-output"></div>
+
+    </div>
 
 
     <!-- JavaScript -->
