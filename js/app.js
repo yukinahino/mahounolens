@@ -7,16 +7,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const targets = document.querySelectorAll(".ar-target");
   const arCharacters = document.querySelectorAll(".ar-character");
 
-  const findGuide = document.querySelector("#find-guide");
   const screenshotGuide = document.querySelector("#screenshot-guide");
   const endButton = document.querySelector("#end-button");
-
 
   // 各マーカー
   targets.forEach((target) => {
 
     target.addEventListener("targetFound", () => {
       console.log(`マーカーを見つけました：${target.id}`);
+
+      screenshotGuide.hidden = false;
+      endButton.hidden = false;
     });
 
     target.addEventListener("targetLost", () => {
@@ -24,24 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   });
-
-
-  // ARキャラクタータップ
-  arCharacters.forEach((character) => {
-
-    character.addEventListener("click", () => {
-
-      console.log(
-        `ARキャラクターがタップされました：${character.id}`
-      );
-
-      findGuide.hidden = true;
-      screenshotGuide.hidden = false;
-
-    });
-
-  });
-
 
   // つぎへ
   endButton.addEventListener("click", () => {
@@ -122,10 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // 通常UIはデバッグ中は隠す
-  findGuide.style.display = "none";
   screenshotGuide.style.display = "none";
   endButton.style.display = "none";
-
 
 
   // =========================
@@ -345,8 +326,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ).textContent = height.toFixed(2);
 
     document.querySelector(
-      "#debug-rotation-value"
-    ).textContent =
+        "#debug-rotation-value"
+      ).textContent =
       `${rotation}°`;
 
 

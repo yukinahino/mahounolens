@@ -219,7 +219,6 @@ a {
 
 /* ========================================
    SCR03 / END
-   ※end.html調整までは既存デザインを保持
 ======================================== */
 
 .end-screen {
@@ -254,37 +253,19 @@ a {
   text-align: center;
 }
 
-.end-kicker {
-  margin: 0 0 4px;
-  color: var(--green-dark);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-}
-
-.end-title {
-  margin: 0 0 12px;
-  color: var(--orange);
-  font-size: clamp(38px, 11vw, 52px);
-  line-height: 1.1;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-}
-
-.end-visual {
-  width: min(92vw, 360px);
-  height: 140px;
-  margin: 0 auto 14px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.end-title-image {
+  display: block;
+  width: min(88%, 340px);
+  height: auto;
+  margin: 0 auto 18px;
 }
 
 .end-characters {
   display: block;
-  width: 100%;
+  width: min(90%, 360px);
   height: auto;
+  margin: 0 auto 18px;
+  filter: drop-shadow(0 8px 10px rgba(96, 77, 48, 0.08));
 }
 
 .end-message {
@@ -298,7 +279,7 @@ a {
   margin: 0 0 20px;
   padding: 18px 16px;
   border-radius: 24px;
-  background: rgba(255,255,255,0.54);
+  background: rgba(255, 255, 255, 0.54);
   border: 1px solid rgba(104, 130, 84, 0.12);
   box-shadow: 0 7px 20px rgba(90, 77, 54, 0.05);
 }
@@ -318,33 +299,24 @@ a {
   font-weight: 800;
 }
 
-.retry-button {
+.end-actions {
   width: 100%;
-  min-height: 62px;
-  margin-bottom: 12px;
-  padding: 14px 20px;
-  border: 0;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #69a875 0%, var(--green) 100%);
-  color: #fffdf7;
-  font-size: 17px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: var(--shadow);
 }
 
-.top-button {
-  width: 100%;
-  min-height: 52px;
-  padding: 12px 18px;
-  border: 2px solid #78a47d;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.40);
-  color: var(--green-dark);
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
+.end-image-button {
+  max-width: 330px;
+  margin: 0 auto 14px;
+  transition: transform 0.15s ease;
 }
+
+.end-image-button:last-child {
+  margin-bottom: 0;
+}
+
+.end-image-button:active {
+  transform: translateY(2px) scale(0.99);
+}
+
 
 /* ========================================
    SMALL SCREENS

@@ -1,39 +1,89 @@
-<main class="end-screen">
+<!DOCTYPE html>
+<html lang="ja">
 
-  <section class="end-content">
+<head>
+  <meta charset="UTF-8">
 
-    <img
-      src="assets/images/characters-group.png"
-      alt="えほんのなかまたち"
-      class="end-characters"
-    >
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no"
+  >
 
-    <h1 class="end-title">
-      たのしかったね！
-    </h1>
+  <title>まほうのレンズ</title>
 
-    <p class="end-message">
-      きょうのおもいでを、<br>
-      SNSにとうこうして<br>
-      おともだちにおしえてあげてね！
-    </p>
+  <link rel="stylesheet" href="css/style.css">
+</head>
 
-    <button
-      id="retry-button"
-      class="retry-button"
-      type="button"
-    >
-      もういちどさがす
-    </button>
+<body>
 
-    <button
-      id="top-button"
-      class="top-button"
-      type="button"
-    >
-      はじめにもどる
-    </button>
+  <main class="end-screen">
 
-  </section>
+    <section class="end-content">
 
-</main>
+      <!-- タイトル画像 -->
+      <img
+        src="assets/images/end-title.png"
+        alt="たのしかったね！"
+        class="end-title-image"
+      >
+
+      <!-- キャラクター画像 -->
+      <img
+        src="assets/images/characters-end.png"
+        alt="えほんのなかまたち"
+        class="end-characters"
+      >
+
+      <!-- メッセージ -->
+      <p class="end-message">
+        きょうの おもいでを<br>
+        おともだち にも おしえて あげてね！
+      </p>
+
+      <!-- ハッシュタグカード -->
+      <div class="end-card">
+        <p class="screenshot-guide">
+          ハッシュタグをつけて<br>
+          SNSにとうこうしてね！
+        </p>
+
+        <p class="hashtag">
+          #えほんpicnic<br>
+          #まほうのレンズ<br>
+          #靱公園
+        </p>
+      </div>
+
+      <!-- ボタン画像 -->
+      <div class="end-actions">
+        <button
+          id="retry-button"
+          class="image-link-button end-image-button"
+          type="button"
+        >
+          <img
+            src="assets/images/button-retry.png"
+            alt="もういちどさがす"
+          >
+        </button>
+
+        <button
+          id="top-button"
+          class="image-link-button end-image-button"
+          type="button"
+        >
+          <img
+            src="assets/images/button-top.png"
+            alt="はじめにもどる"
+          >
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="js/end.js"></script>
+
+</body>
+</html>
