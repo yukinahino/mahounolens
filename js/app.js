@@ -1,531 +1,272 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // =========================
+  // =========================================
   // 通常AR処理
-  // =========================
+  // 新仕様：
+  // リーフレットのマーカーを認識
+  // → 対応するARキャラクターを画面固定表示
+  // → マーカーを外しても表示を維持
+  // → 「つぎの えほんを さがす」でOFF
+  // =========================================
 
   const targets = document.querySelectorAll(".ar-target");
-  const arCharacters = document.querySelectorAll(".ar-character");
 
+  const overlay = document.querySelector("#ar-overlay");
+  const overlayCharacter = document.querySelector("#overlay-character");
   const screenshotGuide = document.querySelector("#screenshot-guide");
-  const endButton = document.querySelector("#end-button");
+  const nextBookButton = document.querySelector("#next-book-button");
 
-  // 各マーカー
+  // ar.html の <a-assets> をそのまま参照
+  const characterAssets = {
+    slide: document.querySelector("#ar-slide"),
+    flower: document.querySelector("#ar-flower"),
+    horse: document.querySelector("#ar-horse"),
+    water: document.querySelector("#ar-water")
+  };
+
+  let characterActive = false;
+  let currentCharacter = null;
+
+
+  // =========================================
+  // ARキャラクター表示
+  // =========================================
+
+  function showCharacter(characterName) {
+
+    const asset = characterAssets[characterName];
+
+    if (!asset) {
+      console.warn(
+        `AR画像が見つかりません：${characterName}`
+      );
+      return;
+    }
+
+    // <a-assets> 内の画像パスを画面固定用 img に渡す
+    overlayCharacter.src =
+      asset.getAttribute("src");
+
+    overlay.hidden = false;
+    screenshotGuide.hidden = false;
+    nextBookButton.hidden = false;
+
+    characterActive = true;
+    currentCharacter = characterName;
+
+    console.log(
+      `ARキャラクター表示：${characterName}`
+    );
+  }
+
+
+  // =========================================
+  // ARキャラクター非表示
+  // =========================================
+
+  function hideCharacter() {
+
+    overlay.hidden = true;
+    screenshotGuide.hidden = true;
+    nextBookButton.hidden = true;
+
+    overlayCharacter.removeAttribute("src");
+
+    characterActive = false;
+    currentCharacter = null;
+
+    console.log(
+      "ARキャラクターをOFF：次のマーカーを待機"
+    );
+  }
+
+
+  // =========================================
+  // MindAR ターゲットイベント
+  // =========================================
+
   targets.forEach((target) => {
 
-    target.addEventListener("targetFound", () => {
-      console.log(`マーカーを見つけました：${target.id}`);
+    target.addEventListener(
+      "targetFound",
+      () => {
 
-      screenshotGuide.hidden = false;
-      endButton.hidden = false;
-    });
+        const characterName =
+          target.dataset.character;
 
-    target.addEventListener("targetLost", () => {
-      console.log(`マーカーを見失いました：${target.id}`);
-    });
+        console.log(
+          `マーカーを見つけました：${target.id} / ${characterName}`
+        );
+
+        // すでにキャラクター表示中なら、
+        // 別マーカーを認識しても切り替えない
+        if (characterActive) {
+          return;
+        }
+
+        showCharacter(characterName);
+      }
+    );
+
+
+    // 新仕様では targetLost してもARを消さない
+    target.addEventListener(
+      "targetLost",
+      () => {
+
+        console.log(
+          `マーカーを見失いました：${target.id}`
+        );
+
+        // 何もしない
+        // → リーフレットからスマホを外しても
+        //   ARキャラクターを画面に残す
+      }
+    );
 
   });
 
-  // つぎへ
-  endButton.addEventListener("click", () => {
-    window.location.href = "end.html";
-  });
 
+  // =========================================
+  // 「つぎの えほんを さがす」
+  // =========================================
+
+  nextBookButton.addEventListener(
+    "click",
+    () => {
+
+      hideCharacter();
+
+    }
+  );
 
 
   // =========================================
   // DEBUG MODE
-  // ar.html?debug=true で有効
+  // ar.html?debug=true
+  //
+  // 旧A-Frame配置調整パネルは、
+  // 今回「画面固定オーバーレイ方式」に変更したため
+  // A-Frame座標調整には使用しない。
+  //
+  // 提出用コードでは通常非表示のままにする。
   // =========================================
 
-  const params = new URLSearchParams(window.location.search);
-  const debugMode = params.get("debug") === "true";
+  const params =
+    new URLSearchParams(window.location.search);
 
-  if (!debugMode) {
-    return;
-  }
+  const debugMode =
+    params.get("debug") === "true";
 
+  if (debugMode) {
 
-  console.log("AR DEBUG MODE ON");
+    const debugPanel =
+      document.querySelector("#ar-debug-panel");
 
-
-  // =========================
-  // UI取得
-  // =========================
-
-  const debugPanel =
-    document.querySelector("#ar-debug-panel");
-
-  const targetSelect =
-    document.querySelector("#debug-target-select");
-
-  const markerFile =
-    document.querySelector("#debug-marker-file");
-
-  const preview =
-    document.querySelector("#debug-preview");
-
-  const markerImage =
-    document.querySelector("#debug-marker-image");
-
-  const previewCharacter =
-    document.querySelector("#debug-character-image");
-
-
-  const inputX =
-    document.querySelector("#debug-x");
-
-  const inputY =
-    document.querySelector("#debug-y");
-
-  const inputZ =
-    document.querySelector("#debug-z");
-
-  const inputWidth =
-    document.querySelector("#debug-width");
-
-  const inputHeight =
-    document.querySelector("#debug-height");
-
-  const inputRotation =
-    document.querySelector("#debug-rotation");
-
-  const flipX =
-    document.querySelector("#debug-flip-x");
-
-  const flipY =
-    document.querySelector("#debug-flip-y");
-
-
-  const output =
-    document.querySelector("#debug-output");
-
-
-  debugPanel.style.display = "block";
-
-
-  // 通常UIはデバッグ中は隠す
-  screenshotGuide.style.display = "none";
-  endButton.style.display = "none";
-
-
-  // =========================
-  // AR対象一覧
-  // =========================
-
-  const debugTargets = {
-
-    slide: {
-      character: "#ar-character-slide",
-      asset: "#ar-slide"
-    },
-
-    flower: {
-      character: "#ar-character-flower",
-      asset: "#ar-flower"
-    },
-
-    table: {
-      character: "#ar-character-table",
-      asset: "#ar-table"
-    },
-
-    water: {
-      character: "#ar-character-water",
-      asset: "#ar-water"
-    },
-
-    horse: {
-      character: "#ar-character-horse",
-      asset: "#ar-horse"
+    if (debugPanel) {
+      debugPanel.style.display = "block";
     }
 
-  };
-
-
-  let currentCharacter = null;
-
-  // ターゲットごとのマーカー画像を保存
-  const markerSources = {};
-
-
-
-  // =========================
-  // 現在のAR値を読み込む
-  // =========================
-
-  function loadTarget() {
-
-    const key = targetSelect.value;
-    const config = debugTargets[key];
-
-    currentCharacter =
-      document.querySelector(config.character);
-
-    const asset =
-      document.querySelector(config.asset);
-
-
-    // AR PNGをプレビューへ
-    previewCharacter.src = asset.src;
-
-
-    // 現在の値取得
-    const position =
-      currentCharacter.getAttribute("position");
-
-    const rotation =
-      currentCharacter.getAttribute("rotation");
-
-    const scale =
-      currentCharacter.getAttribute("scale");
-
-
-    inputX.value = position.x;
-    inputY.value = position.y;
-    inputZ.value = position.z;
-
-    inputWidth.value =
-      parseFloat(
-        currentCharacter.getAttribute("width")
-      );
-
-    inputHeight.value =
-      parseFloat(
-        currentCharacter.getAttribute("height")
-      );
-
-    inputRotation.value = rotation.z;
-
-
-    flipX.checked =
-      scale.x < 0;
-
-    flipY.checked =
-      scale.y < 0;
-
-
-    // 登録済みマーカーがあれば表示
-    if (markerSources[key]) {
-      markerImage.src =
-        markerSources[key];
-    } else {
-      markerImage.removeAttribute("src");
-    }
-
-
-    updateAll();
-
-  }
-
-
-
-  // =========================
-  // スライダー → ARへ反映
-  // =========================
-
-  function updateAll() {
-
-    if (!currentCharacter) return;
-
-
-    const x =
-      parseFloat(inputX.value);
-
-    const y =
-      parseFloat(inputY.value);
-
-    const z =
-      parseFloat(inputZ.value);
-
-    const width =
-      parseFloat(inputWidth.value);
-
-    const height =
-      parseFloat(inputHeight.value);
-
-    const rotation =
-      parseFloat(inputRotation.value);
-
-
-    const scaleX =
-      flipX.checked ? -1 : 1;
-
-    const scaleY =
-      flipY.checked ? -1 : 1;
-
-
-    // =========================
-    // 本物のA-Frameへ反映
-    // =========================
-
-    currentCharacter.setAttribute(
-      "position",
-      `${x} ${y} ${z}`
+    console.log(
+      "DEBUG MODE ON：現在は画面固定AR方式です"
     );
 
-    currentCharacter.setAttribute(
-      "width",
-      width
-    );
+    // デバッグ中にターゲット選択で
+    // 各AR画像を簡易プレビューできるようにする
+    const targetSelect =
+      document.querySelector("#debug-target-select");
 
-    currentCharacter.setAttribute(
-      "height",
-      height
-    );
+    const previewCharacter =
+      document.querySelector("#debug-character-image");
 
-    currentCharacter.setAttribute(
-      "rotation",
-      `0 0 ${rotation}`
-    );
+    const markerFile =
+      document.querySelector("#debug-marker-file");
 
-    currentCharacter.setAttribute(
-      "scale",
-      `${scaleX} ${scaleY} 1`
-    );
+    const markerImage =
+      document.querySelector("#debug-marker-image");
+
+    const preview =
+      document.querySelector("#debug-preview");
 
 
+    function updateDebugCharacter() {
 
-    // =========================
-    // 2Dプレビューへ反映
-    // =========================
-
-    updatePreview(
-      x,
-      y,
-      width,
-      height,
-      rotation,
-      scaleX,
-      scaleY
-    );
-
-
-    // =========================
-    // 数値表示
-    // =========================
-
-    document.querySelector(
-      "#debug-x-value"
-    ).textContent = x.toFixed(2);
-
-    document.querySelector(
-      "#debug-y-value"
-    ).textContent = y.toFixed(2);
-
-    document.querySelector(
-      "#debug-z-value"
-    ).textContent = z.toFixed(2);
-
-    document.querySelector(
-      "#debug-width-value"
-    ).textContent = width.toFixed(2);
-
-    document.querySelector(
-      "#debug-height-value"
-    ).textContent = height.toFixed(2);
-
-    document.querySelector(
-        "#debug-rotation-value"
-      ).textContent =
-      `${rotation}°`;
-
-
-    // =========================
-    // コピペ用コード
-    // =========================
-
-    output.textContent =
-      `position="${x} ${y} ${z}" ` +
-      `rotation="0 0 ${rotation}" ` +
-      `scale="${scaleX} ${scaleY} 1" ` +
-      `width="${width}" ` +
-      `height="${height}"`;
-
-  }
-
-
-
-  // =========================
-  // 2Dプレビュー計算
-  // =========================
-
-  function updatePreview(
-    x,
-    y,
-    width,
-    height,
-    rotation,
-    scaleX,
-    scaleY
-  ) {
-
-    const previewWidth =
-      preview.clientWidth;
-
-    const previewHeight =
-      preview.clientHeight;
-
-
-    if (
-      previewWidth === 0 ||
-      previewHeight === 0
-    ) {
-      return;
-    }
-
-
-    /*
-      MindARではターゲット横幅を
-      おおむね1単位として扱うため、
-
-      x = 0.5
-      → マーカー横幅の半分移動
-
-      としてプレビュー。
-    */
-
-    const centerX =
-      previewWidth / 2;
-
-    const centerY =
-      previewHeight / 2;
-
-
-    const pixelX =
-      centerX +
-      (x * previewWidth);
-
-    const pixelY =
-      centerY -
-      (y * previewWidth);
-
-
-    const pixelWidth =
-      width * previewWidth;
-
-    const pixelHeight =
-      height * previewWidth;
-
-
-    previewCharacter.style.left =
-      `${pixelX}px`;
-
-    previewCharacter.style.top =
-      `${pixelY}px`;
-
-    previewCharacter.style.width =
-      `${pixelWidth}px`;
-
-    previewCharacter.style.height =
-      `${pixelHeight}px`;
-
-    previewCharacter.style.transform =
-      `
-      translate(-50%, -50%)
-      rotate(${-rotation}deg)
-      scale(${scaleX}, ${scaleY})
-      `;
-
-  }
-
-
-
-  // =========================
-  // マーカー画像読み込み
-  // =========================
-
-  markerFile.addEventListener(
-    "change",
-    (event) => {
-
-      const file =
-        event.target.files[0];
-
-      if (!file) return;
-
-
-      const url =
-        URL.createObjectURL(file);
+      if (!targetSelect || !previewCharacter) {
+        return;
+      }
 
       const key =
         targetSelect.value;
 
-      markerSources[key] =
-        url;
+      const asset =
+        characterAssets[key];
 
-      markerImage.src =
-        url;
+      if (!asset) {
+        return;
+      }
 
+      previewCharacter.src =
+        asset.getAttribute("src");
+
+      previewCharacter.style.left = "50%";
+      previewCharacter.style.top = "50%";
+      previewCharacter.style.width = "45%";
+      previewCharacter.style.height = "auto";
+      previewCharacter.style.transform =
+        "translate(-50%, -50%)";
     }
-  );
 
 
+    if (targetSelect) {
 
-  // マーカー画像比率をプレビューへ反映
-  markerImage.addEventListener(
-    "load",
-    () => {
+      targetSelect.addEventListener(
+        "change",
+        updateDebugCharacter
+      );
 
-      const ratio =
-        markerImage.naturalWidth /
-        markerImage.naturalHeight;
-
-      preview.style.aspectRatio =
-        ratio;
-
-      updateAll();
-
+      updateDebugCharacter();
     }
-  );
 
 
+    if (markerFile && markerImage) {
 
-  // =========================
-  // UIイベント
-  // =========================
+      markerFile.addEventListener(
+        "change",
+        (event) => {
 
-  targetSelect.addEventListener(
-    "change",
-    loadTarget
-  );
+          const file =
+            event.target.files[0];
 
+          if (!file) {
+            return;
+          }
 
-  [
-    inputX,
-    inputY,
-    inputZ,
-    inputWidth,
-    inputHeight,
-    inputRotation
-  ].forEach((input) => {
+          const url =
+            URL.createObjectURL(file);
 
-    input.addEventListener(
-      "input",
-      updateAll
-    );
-
-  });
+          markerImage.src = url;
+        }
+      );
 
 
-  flipX.addEventListener(
-    "change",
-    updateAll
-  );
+      markerImage.addEventListener(
+        "load",
+        () => {
 
-  flipY.addEventListener(
-    "change",
-    updateAll
-  );
+          if (!preview) {
+            return;
+          }
 
+          const ratio =
+            markerImage.naturalWidth /
+            markerImage.naturalHeight;
 
-  window.addEventListener(
-    "resize",
-    updateAll
-  );
+          preview.style.aspectRatio =
+            ratio;
+        }
+      );
+    }
 
-
-  // 最初のターゲット
-  loadTarget();
+  }
 
 });
