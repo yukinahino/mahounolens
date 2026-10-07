@@ -118,18 +118,49 @@
         pointer-events: none;
     }
 
-    #next-book-button {
-        position: fixed;
-        z-index: 30;
-        left: 50%;
-        bottom: 32px;
-        transform: translateX(-50%);
-        padding: 12px 20px;
-        border: 0;
-        border-radius: 999px;
-        font: inherit;
-        cursor: pointer;
-    }
+    #ar-action-buttons {
+    position: fixed;
+    z-index: 30;
+
+    left: 50%;
+    bottom: 32px;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    gap: 12px;
+
+    width: calc(100% - 32px);
+    max-width: 420px;
+
+    justify-content: center;
+    align-items: center;
+}
+
+#ar-action-buttons[hidden] {
+    display: none;
+}
+
+#ar-action-buttons .end-button {
+    position: static;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+
+    flex: 1;
+
+    padding: 12px 16px;
+
+    border: 0;
+    border-radius: 999px;
+
+    font: inherit;
+    cursor: pointer;
+
+    min-width: 0;
+}
+
 </style>
 
 <head>
@@ -224,9 +255,17 @@
         いっしょに しゃしんを とろう！
     </div>
 
-    <button id="next-book-button" class="end-button" type="button" hidden>
-        つぎの えほんを さがす
-    </button>
+    <div id="ar-action-buttons" hidden>
+
+        <button id="next-book-button" class="end-button" type="button">
+            もういちどさがす
+        </button>
+
+        <button id="finish-button" class="end-button" type="button">
+            おわる
+        </button>
+
+    </div>
 
     <!-- ======================================
      AR配置調整パネル

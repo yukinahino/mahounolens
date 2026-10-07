@@ -2,21 +2,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // =========================================
   // 通常AR処理
-  // 新仕様：
-  // リーフレットのマーカーを認識
+  // マーカーを認識
   // → 対応するARキャラクターを画面固定表示
   // → マーカーを外しても表示を維持
-  // → 「つぎの えほんを さがす」でOFF
+  // → 「もういちどさがす」で探索状態へ戻る
+  // → 「おわる」で end.html へ遷移
   // =========================================
 
-  const targets = document.querySelectorAll(".ar-target");
+  const targets =
+    document.querySelectorAll(".ar-target");
 
-  const overlay = document.querySelector("#ar-overlay");
-  const overlayCharacter = document.querySelector("#overlay-character");
-  const screenshotGuide = document.querySelector("#screenshot-guide");
-  const nextBookButton = document.querySelector("#next-book-button");
+  const overlay =
+    document.querySelector("#ar-overlay");
 
-  // ar.html の <a-assets> をそのまま参照
+  const overlayCharacter =
+    document.querySelector("#overlay-character");
+
+  const screenshotGuide =
+    document.querySelector("#screenshot-guide");
+
+  const actionButtons =
+    document.querySelector("#ar-action-buttons");
+
+  const nextBookButton =
+    document.querySelector("#next-book-button");
+
+  const finishButton =
+    document.querySelector("#finish-button");
+
+
+  // =========================================
+  // AR画像
+  // =========================================
+
   const characterAssets = {
     slide: document.querySelector("#ar-slide"),
     flower: document.querySelector("#ar-flower"),
@@ -24,9 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
     water: document.querySelector("#ar-water")
   };
 
+
   // =========================================
   // キャラクターごとの画面表示設定
+  // ※調整済み数値
   // =========================================
+
   const characterDisplaySettings = {
 
     horse: {
@@ -49,8 +70,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   };
 
+
   let characterActive = false;
   let currentCharacter = null;
+
+
+  // =========================================
+  // MindAR 探索枠 ON / OFF
+  // =========================================
+
+  function setScanningGuideVisible(visible) {
+
+    const scanningUI =
+      document.querySelector(".mindar-ui-scanning");
+
+    if (!scanningUI) {
+      return;
+    }
+
+    scanningUI.style.display =
+      visible ? "" : "none";
+  }
 
 
   // =========================================
@@ -59,255 +99,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showCharacter(characterName) {
 
-    const asset = characterAssets[characterName];
-
-    if (!asset) {
-      console.warn(
-        `AR画像が見つかりません：${characterName}`
-      );
-      return;
-    }
-
-    // <a-assets> 内の画像パスを画面固定用 img に渡す
-    overlayCharacter.src =
-      asset.getAttribute("src");
+    const asset =
+      characterAssets[characterName];
 
     const setting =
       characterDisplaySettings[characterName];
 
-    if (setting) {
 
-      overlayCharacter.style.left =
-        `${setting.x}%`;
-
-      overlayCharacter.style.top =
-        `${setting.y}%`;
-
-      overlayCharacter.style.width =
-        `${setting.width}vw`;
-
-      const scaleX =
-        setting.flipX ? -1 : 1;
-
-      const scaleY =
-        setting.flipY ? -1 : 1;
-
-      overlayCharacter.style.transform =
-        `translate(-50%, -50%)
-     rotate(${setting.rotation}deg)
-     scale(${scaleX}, ${scaleY})`;
-    }
-
-    overlay.hidden = false;
-    screenshotGuide.hidden = false;
-    nextBookButton.hidden = false;
-
-    characterActive = true;
-    currentCharacter = characterName;
-
-    console.log(
-      `ARキャラクター表示：${characterName}`
-    );
-  }
-
-
-  // =========================================
-  // ARキャラクター非表示
-  // =========================================
-
-  function hideCharacter() {
-
-    overlay.hidden = true;
-    screenshotGuide.hidden = true;
-    nextBookButton.hidden = true;
-
-    overlayCharacter.removeAttribute("src");
-
-    characterActive = false;
-    currentCharacter = null;
-
-    console.log(
-      "ARキャラクターをOFF：次のマーカーを待機"
-    );
-  }
-
-
-  // =========================================
-  // MindAR ターゲットイベント
-  // =========================================
-
-  targets.forEach((target) => {
-
-    target.addEventListener(
-      "targetFound",
-      () => {
-
-        const characterName =
-          target.dataset.character;
-
-        console.log(
-          `マーカーを見つけました：${target.id} / ${characterName}`
-        );
-
-        // すでにキャラクター表示中なら、
-        // 別マーカーを認識しても切り替えない
-        if (characterActive) {
-          return;
-        }
-
-        showCharacter(characterName);
-      }
-    );
-
-
-    // 新仕様では targetLost してもARを消さない
-    target.addEventListener(
-      "targetLost",
-      () => {
-
-        console.log(
-          `マーカーを見失いました：${target.id}`
-        );
-
-        // 何もしない
-        // → リーフレットからスマホを外しても
-        //   ARキャラクターを画面に残す
-      }
-    );
-
-  });
-
-
-  // =========================================
-  // 「つぎの えほんを さがす」
-  // =========================================
-
-  nextBookButton.addEventListener(
-    "click",
-    () => {
-
-      hideCharacter();
-
-    }
-  );
-
-// =========================================
-// DEBUG MODE
-// ar.html?debug=true
-// =========================================
-
-const params =
-  new URLSearchParams(window.location.search);
-
-const debugMode =
-  params.get("debug") === "true";
-
-
-if (debugMode) {
-
-  console.log(
-    "DEBUG MODE ON：実際のARキャラクターを直接調整"
-  );
-
-
-  // =========================================
-  // パネル
-  // =========================================
-
-  const debugPanel =
-    document.querySelector("#ar-debug-panel");
-
-  if (debugPanel) {
-    debugPanel.style.display = "block";
-  }
-
-
-  // =========================================
-  // DEBUG中は通常UIを隠す
-  // =========================================
-
-  screenshotGuide.hidden = true;
-  nextBookButton.hidden = true;
-
-
-  // =========================================
-  // 実際のAR表示領域をON
-  // =========================================
-
-  overlay.hidden = false;
-
-  // マーカー認識による切替を防ぐ
-  characterActive = true;
-
-
-  // =========================================
-  // UI取得
-  // =========================================
-
-  const targetSelect =
-    document.querySelector("#debug-target-select");
-
-  const xSlider =
-    document.querySelector("#debug-x");
-
-  const ySlider =
-    document.querySelector("#debug-y");
-
-  const widthSlider =
-    document.querySelector("#debug-width");
-
-  const rotationSlider =
-    document.querySelector("#debug-rotation");
-
-  const flipXCheckbox =
-    document.querySelector("#debug-flip-x");
-
-  const flipYCheckbox =
-    document.querySelector("#debug-flip-y");
-
-
-  const xValue =
-    document.querySelector("#debug-x-value");
-
-  const yValue =
-    document.querySelector("#debug-y-value");
-
-  const widthValue =
-    document.querySelector("#debug-width-value");
-
-  const rotationValue =
-    document.querySelector("#debug-rotation-value");
-
-  const debugOutput =
-    document.querySelector("#debug-output");
-
-
-  // =========================================
-  // 実際のARキャラクターへ反映
-  // =========================================
-
-  function applyDebugSetting() {
-
-    const key =
-      targetSelect.value;
-
-    const asset =
-      characterAssets[key];
-
-    const setting =
-      characterDisplaySettings[key];
-
+    // 今回使用するのは馬・水飲み場のみ
     if (!asset || !setting) {
+
+      console.log(
+        `未使用ターゲットのため表示しません：${characterName}`
+      );
+
       return;
     }
 
 
-    // 本番と同じ画像
+    // 画像を画面固定用 img に渡す
     overlayCharacter.src =
       asset.getAttribute("src");
 
 
-    // 本番ARそのものを移動
+    // キャラクター別の位置・サイズを反映
     overlayCharacter.style.left =
       `${setting.x}%`;
 
@@ -334,169 +149,565 @@ if (debugMode) {
        scale(${scaleX}, ${scaleY})`;
 
 
-    // UIへ現在値を反映
-    xSlider.value =
-      setting.x;
+    // 発見後UIを表示
+    if (overlay) {
+      overlay.hidden = false;
+    }
 
-    ySlider.value =
-      setting.y;
+    if (screenshotGuide) {
+      screenshotGuide.hidden = false;
+    }
 
-    widthSlider.value =
-      setting.width;
-
-    rotationSlider.value =
-      setting.rotation;
-
-    flipXCheckbox.checked =
-      setting.flipX;
-
-    flipYCheckbox.checked =
-      setting.flipY;
-
-
-    updateDebugValues();
-
-  }
-
-
-  // =========================================
-  // 数値表示
-  // =========================================
-
-  function updateDebugValues() {
-
-    const key =
-      targetSelect.value;
-
-    const setting =
-      characterDisplaySettings[key];
-
-    if (!setting) {
-      return;
+    if (actionButtons) {
+      actionButtons.hidden = false;
     }
 
 
-    xValue.textContent =
-      `${setting.x}%`;
-
-    yValue.textContent =
-      `${setting.y}%`;
-
-    widthValue.textContent =
-      `${setting.width}vw`;
-
-    rotationValue.textContent =
-      `${setting.rotation}°`;
+    // スクリーンショットの邪魔になる探索枠を消す
+    setScanningGuideVisible(false);
 
 
-    debugOutput.innerHTML =
-      `
-      <strong>${key}</strong><br>
-      x: ${setting.x},<br>
-      y: ${setting.y},<br>
-      width: ${setting.width},<br>
-      rotation: ${setting.rotation},<br>
-      flipX: ${setting.flipX},<br>
-      flipY: ${setting.flipY}
-      `;
+    characterActive = true;
+    currentCharacter = characterName;
 
+
+    console.log(
+      `ARキャラクター表示：${characterName}`
+    );
   }
 
 
   // =========================================
-  // スライダー操作
+  // ARキャラクター非表示
+  // 「もういちどさがす」で探索状態へ戻る
   // =========================================
 
-  function updateSettingFromControls() {
+  function hideCharacter() {
 
-    const key =
-      targetSelect.value;
+    if (overlay) {
+      overlay.hidden = true;
+    }
 
-    const setting =
-      characterDisplaySettings[key];
+    if (screenshotGuide) {
+      screenshotGuide.hidden = true;
+    }
 
-    if (!setting) {
-      return;
+    if (actionButtons) {
+      actionButtons.hidden = true;
+    }
+
+    if (overlayCharacter) {
+      overlayCharacter.removeAttribute("src");
     }
 
 
-    setting.x =
-      Number(xSlider.value);
-
-    setting.y =
-      Number(ySlider.value);
-
-    setting.width =
-      Number(widthSlider.value);
-
-    setting.rotation =
-      Number(rotationSlider.value);
-
-    setting.flipX =
-      flipXCheckbox.checked;
-
-    setting.flipY =
-      flipYCheckbox.checked;
+    characterActive = false;
+    currentCharacter = null;
 
 
-    // 実際のARへ即反映
-    applyDebugSetting();
+    // 再探索するため探索枠を戻す
+    setScanningGuideVisible(true);
 
+
+    console.log(
+      "ARキャラクターをOFF：次のマーカーを待機"
+    );
   }
 
 
   // =========================================
-  // キャラクター切替
+  // MindAR ターゲットイベント
   // =========================================
 
-  targetSelect.addEventListener(
-    "change",
-    applyDebugSetting
-  );
+  targets.forEach((target) => {
+
+    target.addEventListener(
+      "targetFound",
+      () => {
+
+        const characterName =
+          target.dataset.character;
 
 
-  // =========================================
-  // スライダー
-  // =========================================
+        console.log(
+          `マーカーを見つけました：${target.id} / ${characterName}`
+        );
 
-  [
-    xSlider,
-    ySlider,
-    widthSlider,
-    rotationSlider
 
-  ].forEach((control) => {
+        // キャラクター表示中は
+        // 他のマーカーを認識しても切り替えない
+        if (characterActive) {
+          return;
+        }
 
-    control.addEventListener(
-      "input",
-      updateSettingFromControls
+
+        // 馬・水飲み場以外は使用しない
+        if (!characterDisplaySettings[characterName]) {
+          return;
+        }
+
+
+        showCharacter(characterName);
+      }
+    );
+
+
+    // マーカーを見失ってもARは消さない
+    target.addEventListener(
+      "targetLost",
+      () => {
+
+        console.log(
+          `マーカーを見失いました：${target.id}`
+        );
+
+        // 何もしない
+        // → マーカーからスマホを外しても
+        //   ARキャラクターを画面に残す
+      }
     );
 
   });
 
 
   // =========================================
-  // 反転
+  // 「もういちどさがす」
   // =========================================
 
-  flipXCheckbox.addEventListener(
-    "change",
-    updateSettingFromControls
-  );
+  if (nextBookButton) {
 
-  flipYCheckbox.addEventListener(
-    "change",
-    updateSettingFromControls
-  );
+    nextBookButton.addEventListener(
+      "click",
+      () => {
+
+        hideCharacter();
+
+      }
+    );
+
+  }
 
 
   // =========================================
-  // 初期表示
+  // 「おわる」
   // =========================================
 
-  applyDebugSetting();
+  if (finishButton) {
 
-}
+    finishButton.addEventListener(
+      "click",
+      () => {
 
-// DOMContentLoaded 終了
+        window.location.href =
+          "end.html";
+
+      }
+    );
+
+  }
+
+
+  // =========================================
+  // DEBUG MODE
+  // ar.html?debug=true
+  // =========================================
+
+  const params =
+    new URLSearchParams(window.location.search);
+
+  const debugMode =
+    params.get("debug") === "true";
+
+
+  if (debugMode) {
+
+    console.log(
+      "DEBUG MODE ON：実際のARキャラクターを直接調整"
+    );
+
+
+    // =========================================
+    // パネル
+    // =========================================
+
+    const debugPanel =
+      document.querySelector("#ar-debug-panel");
+
+    if (debugPanel) {
+      debugPanel.style.display = "block";
+    }
+
+
+    // =========================================
+    // DEBUG中は通常UIを隠す
+    // =========================================
+
+    if (screenshotGuide) {
+      screenshotGuide.hidden = true;
+    }
+
+    if (actionButtons) {
+      actionButtons.hidden = true;
+    }
+
+
+    // =========================================
+    // 実際のAR表示領域をON
+    // =========================================
+
+    if (overlay) {
+      overlay.hidden = false;
+    }
+
+    // DEBUGではマーカー認識による切替を防ぐ
+    characterActive = true;
+
+    // DEBUGでは探索枠も不要
+    setScanningGuideVisible(false);
+
+    // MindAR側のUI生成が少し遅い場合にも対応
+    setTimeout(
+      () => setScanningGuideVisible(false),
+      500
+    );
+
+
+    // =========================================
+    // UI取得
+    // =========================================
+
+    const targetSelect =
+      document.querySelector("#debug-target-select");
+
+    const xSlider =
+      document.querySelector("#debug-x");
+
+    const ySlider =
+      document.querySelector("#debug-y");
+
+    const widthSlider =
+      document.querySelector("#debug-width");
+
+    const rotationSlider =
+      document.querySelector("#debug-rotation");
+
+    const flipXCheckbox =
+      document.querySelector("#debug-flip-x");
+
+    const flipYCheckbox =
+      document.querySelector("#debug-flip-y");
+
+
+    const xValue =
+      document.querySelector("#debug-x-value");
+
+    const yValue =
+      document.querySelector("#debug-y-value");
+
+    const widthValue =
+      document.querySelector("#debug-width-value");
+
+    const rotationValue =
+      document.querySelector("#debug-rotation-value");
+
+    const debugOutput =
+      document.querySelector("#debug-output");
+
+
+    // =========================================
+    // 実際のARキャラクターへ反映
+    // =========================================
+
+    function applyDebugSetting() {
+
+      if (
+        !targetSelect ||
+        !overlayCharacter
+      ) {
+        return;
+      }
+
+
+      const key =
+        targetSelect.value;
+
+      const asset =
+        characterAssets[key];
+
+      const setting =
+        characterDisplaySettings[key];
+
+
+      if (!asset || !setting) {
+        return;
+      }
+
+
+      overlayCharacter.src =
+        asset.getAttribute("src");
+
+
+      overlayCharacter.style.left =
+        `${setting.x}%`;
+
+      overlayCharacter.style.top =
+        `${setting.y}%`;
+
+      overlayCharacter.style.width =
+        `${setting.width}vw`;
+
+      overlayCharacter.style.maxWidth =
+        "none";
+
+
+      const scaleX =
+        setting.flipX ? -1 : 1;
+
+      const scaleY =
+        setting.flipY ? -1 : 1;
+
+
+      overlayCharacter.style.transform =
+        `translate(-50%, -50%)
+         rotate(${setting.rotation}deg)
+         scale(${scaleX}, ${scaleY})`;
+
+
+      if (xSlider) {
+        xSlider.value = setting.x;
+      }
+
+      if (ySlider) {
+        ySlider.value = setting.y;
+      }
+
+      if (widthSlider) {
+        widthSlider.value = setting.width;
+      }
+
+      if (rotationSlider) {
+        rotationSlider.value = setting.rotation;
+      }
+
+      if (flipXCheckbox) {
+        flipXCheckbox.checked = setting.flipX;
+      }
+
+      if (flipYCheckbox) {
+        flipYCheckbox.checked = setting.flipY;
+      }
+
+
+      updateDebugValues();
+    }
+
+
+    // =========================================
+    // DEBUG 数値表示
+    // =========================================
+
+    function updateDebugValues() {
+
+      if (!targetSelect) {
+        return;
+      }
+
+
+      const key =
+        targetSelect.value;
+
+      const setting =
+        characterDisplaySettings[key];
+
+
+      if (!setting) {
+        return;
+      }
+
+
+      if (xValue) {
+        xValue.textContent =
+          `${setting.x}%`;
+      }
+
+      if (yValue) {
+        yValue.textContent =
+          `${setting.y}%`;
+      }
+
+      if (widthValue) {
+        widthValue.textContent =
+          `${setting.width}vw`;
+      }
+
+      if (rotationValue) {
+        rotationValue.textContent =
+          `${setting.rotation}°`;
+      }
+
+
+      if (debugOutput) {
+
+        debugOutput.innerHTML =
+          `
+          <strong>${key}</strong><br>
+          x: ${setting.x},<br>
+          y: ${setting.y},<br>
+          width: ${setting.width},<br>
+          rotation: ${setting.rotation},<br>
+          flipX: ${setting.flipX},<br>
+          flipY: ${setting.flipY}
+          `;
+
+      }
+
+    }
+
+
+    // =========================================
+    // DEBUG スライダー操作
+    // =========================================
+
+    function updateSettingFromControls() {
+
+      if (
+        !targetSelect ||
+        !xSlider ||
+        !ySlider ||
+        !widthSlider ||
+        !rotationSlider ||
+        !flipXCheckbox ||
+        !flipYCheckbox
+      ) {
+        return;
+      }
+
+
+      const key =
+        targetSelect.value;
+
+      const setting =
+        characterDisplaySettings[key];
+
+
+      if (!setting) {
+        return;
+      }
+
+
+      setting.x =
+        Number(xSlider.value);
+
+      setting.y =
+        Number(ySlider.value);
+
+      setting.width =
+        Number(widthSlider.value);
+
+      setting.rotation =
+        Number(rotationSlider.value);
+
+      setting.flipX =
+        flipXCheckbox.checked;
+
+      setting.flipY =
+        flipYCheckbox.checked;
+
+
+      applyDebugSetting();
+    }
+
+
+    // =========================================
+    // DEBUG キャラクター切替
+    // =========================================
+
+    if (targetSelect) {
+
+      targetSelect.addEventListener(
+        "change",
+        applyDebugSetting
+      );
+
+    }
+
+
+    // =========================================
+    // DEBUG スライダー
+    // =========================================
+
+    [
+      xSlider,
+      ySlider,
+      widthSlider,
+      rotationSlider
+
+    ].forEach((control) => {
+
+      if (!control) {
+        return;
+      }
+
+
+      control.addEventListener(
+        "input",
+        updateSettingFromControls
+      );
+
+    });
+
+
+    // =========================================
+    // DEBUG 反転
+    // =========================================
+
+    if (flipXCheckbox) {
+
+      flipXCheckbox.addEventListener(
+        "change",
+        updateSettingFromControls
+      );
+
+    }
+
+
+    if (flipYCheckbox) {
+
+      flipYCheckbox.addEventListener(
+        "change",
+        updateSettingFromControls
+      );
+
+    }
+
+
+    // =========================================
+    // DEBUG 初期表示
+    // =========================================
+
+    applyDebugSetting();
+
+  }
+
+
+  // =========================================
+  // 通常モード初期状態
+  // =========================================
+
+  if (!debugMode) {
+
+    if (overlay) {
+      overlay.hidden = true;
+    }
+
+    if (screenshotGuide) {
+      screenshotGuide.hidden = true;
+    }
+
+    if (actionButtons) {
+      actionButtons.hidden = true;
+    }
+
+  }
+
 });
