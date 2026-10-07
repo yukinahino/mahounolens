@@ -9,19 +9,32 @@
 
     #ar-debug-panel {
         display: none;
+
         position: fixed;
         z-index: 9999;
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
-        max-height: 92vh;
+
+        right: 12px;
+        bottom: 12px;
+        left: auto;
+
+        width: min(340px, calc(100vw - 24px));
+        max-height: 48vh;
+
         overflow-y: auto;
-        background: rgba(255, 255, 255, 0.96);
+
+        background: rgba(255, 255, 255, 0.92);
         color: #222;
-        padding: 12px;
+
+        padding: 10px;
+
         border-radius: 12px;
+
         font-family: sans-serif;
+        font-size: 13px;
+
         box-sizing: border-box;
+
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
     }
 
     #ar-debug-panel h3 {
@@ -100,7 +113,6 @@
         left: 50%;
         top: 52%;
         width: 42vw;
-        max-width: 280px;
         transform: translate(-50%, -50%);
         transform-origin: center center;
         pointer-events: none;
@@ -118,7 +130,6 @@
         font: inherit;
         cursor: pointer;
     }
-
 </style>
 
 <head>
@@ -175,35 +186,19 @@
         -->
 
         <!-- すべり台 -->
-        <a-entity
-            id="target-slide"
-            class="ar-target"
-            data-character="slide"
-            mindar-image-target="targetIndex: 0">
+        <a-entity id="target-slide" class="ar-target" data-character="slide" mindar-image-target="targetIndex: 0">
         </a-entity>
 
         <!-- 花形トンネル -->
-        <a-entity
-            id="target-flower"
-            class="ar-target"
-            data-character="flower"
-            mindar-image-target="targetIndex: 1">
+        <a-entity id="target-flower" class="ar-target" data-character="flower" mindar-image-target="targetIndex: 1">
         </a-entity>
 
         <!-- 馬 -->
-        <a-entity
-            id="target-horse"
-            class="ar-target"
-            data-character="horse"
-            mindar-image-target="targetIndex: 2">
+        <a-entity id="target-horse" class="ar-target" data-character="horse" mindar-image-target="targetIndex: 2">
         </a-entity>
 
         <!-- 水飲み場 -->
-        <a-entity
-            id="target-water"
-            class="ar-target"
-            data-character="water"
-            mindar-image-target="targetIndex: 3">
+        <a-entity id="target-water" class="ar-target" data-character="water" mindar-image-target="targetIndex: 3">
         </a-entity>
 
 
@@ -236,79 +231,44 @@
     <!-- ======================================
      AR配置調整パネル
      ar.html?debug=true のときのみ表示
-======================================= -->
+    ======================================= -->
     <div id="ar-debug-panel">
 
-        <h3>AR配置調整モード</h3>
+        <h3>AR配置調整</h3>
 
-        <!-- 調整対象 -->
         <select id="debug-target-select">
-            <option value="slide">index0：すべり台</option>
-            <option value="flower">index1：花形トンネル</option>
-            <option value="horse">index2：馬</option>
-            <option value="water">index3：水飲み場</option>
+            <option value="horse">馬</option>
+            <option value="water">水飲み場</option>
         </select>
-
-        <!-- マーカー画像 -->
-        <label>
-            マーカー画像を選択
-            <input id="debug-marker-file" type="file" accept="image/*">
-        </label>
-
-        <!-- プレビュー -->
-        <div id="debug-preview" class="debug-preview">
-
-            <img id="debug-marker-image" alt="マーカー">
-
-            <img id="debug-character-image" alt="ARキャラクター">
-
-        </div>
-
 
         <!-- X -->
         <div class="debug-row">
             <label>X</label>
-            <input id="debug-x" type="range" min="-2" max="2" step="0.01">
+            <input id="debug-x" type="range" min="0" max="100" step="1">
             <span id="debug-x-value"></span>
         </div>
 
         <!-- Y -->
         <div class="debug-row">
             <label>Y</label>
-            <input id="debug-y" type="range" min="-2" max="2" step="0.01">
+            <input id="debug-y" type="range" min="0" max="100" step="1">
             <span id="debug-y-value"></span>
         </div>
 
-        <!-- Z -->
+        <!-- サイズ -->
         <div class="debug-row">
-            <label>Z</label>
-            <input id="debug-z" type="range" min="-1" max="1" step="0.01">
-            <span id="debug-z-value"></span>
-        </div>
-
-        <!-- width -->
-        <div class="debug-row">
-            <label>Width</label>
-            <input id="debug-width" type="range" min="0.1" max="4" step="0.01">
+            <label>サイズ</label>
+            <input id="debug-width" type="range" min="10" max="100" step="1">
             <span id="debug-width-value"></span>
         </div>
 
-        <!-- height -->
-        <div class="debug-row">
-            <label>Height</label>
-            <input id="debug-height" type="range" min="0.1" max="4" step="0.01">
-            <span id="debug-height-value"></span>
-        </div>
-
-        <!-- rotation Z -->
+        <!-- 回転 -->
         <div class="debug-row">
             <label>回転</label>
             <input id="debug-rotation" type="range" min="-180" max="180" step="1">
             <span id="debug-rotation-value"></span>
         </div>
 
-
-        <!-- 反転 -->
         <div class="debug-buttons">
 
             <label>
@@ -323,12 +283,9 @@
 
         </div>
 
-
-        <!-- 最終コード -->
         <div id="debug-output"></div>
 
     </div>
-
 
     <!-- JavaScript -->
     <script src="js/app.js"></script>
